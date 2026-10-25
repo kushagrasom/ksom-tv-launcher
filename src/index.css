@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Updated at runtime by App.jsx to match the current background theme. */
+  --accent-rgb: 124 58 237;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: none; /* remote-driven UI: hide the pointer */
+}
+
+/* ---- Focusable surfaces ------------------------------------------------ */
+
+.tv-focusable {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.05);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  outline: none;
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 320ms ease,
+    border-color 320ms ease,
+    background-color 320ms ease;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.tv-focusable[data-focused='true'] {
+  border-color: rgb(var(--accent-rgb) / 0.95);
+  background: rgb(255 255 255 / 0.12);
+  box-shadow:
+    0 0 0 2px rgb(var(--accent-rgb) / 0.9),
+    0 0 36px 4px rgb(var(--accent-rgb) / 0.45),
+    0 24px 60px -12px rgb(0 0 0 / 0.85);
+}
+
+/* Soft inner sheen that only shows while focused. */
+.tv-focusable::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.14) 0%,
+    rgb(255 255 255 / 0) 55%
+  );
+  opacity: 0;
+  transition: opacity 320ms ease;
+  pointer-events: none;
+}
+.tv-focusable[data-focused='true']::before {
+  opacity: 1;
+}
+
+.tv-ripple {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.5);
+  pointer-events: none;
+}
+
+/* Honour reduced-motion for anyone who needs it. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-ripple {
+    animation: none !important;
+  }
+}
+
+/* ---- Atmosphere --------------------------------------------------------- */
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.26), transparent);
+  transition: background 1500ms ease;
+  will-change: transform;
+}
+.aurora-a {
+  width: 900px;
+  height: 900px;
+  left: -200px;
+  bottom: -300px;
+  animation: auroraA 38s ease-in-out infinite alternate;
+}
+.aurora-b {
+  width: 720px;
+  height: 720px;
+  right: -160px;
+  top: -240px;
+  opacity: 0.8;
+  animation: auroraB 46s ease-in-out infinite alternate;
+}
+@keyframes auroraA {
+  to { transform: translate3d(220px, -120px, 0) scale(1.15); }
+}
+@keyframes auroraB {
+  to { transform: translate3d(-260px, 160px, 0) scale(1.1); }
+}
+
+.grain {
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.keycap {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: rgb(255 255 255 / 0.07);
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: rgb(255 255 255 / 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+}
