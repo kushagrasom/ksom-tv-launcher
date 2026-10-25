@@ -27,25 +27,18 @@ jobs:
       - name: Install Dependencies & Build Web UI
         run: |
           npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/android
           npm run build
 
-      - name: Build Debug APK
+      - name: Add Android Platform & Build APK
         run: |
-          chmod +x ./build-apk.bat || true
-          # Agar capacitor config native folder mein hai
-          if [ -d "android" ]; then
-            cd android
-            chmod +x gradlew
-            ./gradlew assembleDebug
-          else
-            echo "Android folder missing. Initializing capacitor..."
-            npx @capacitor/cli init "Marvel TV Launcher" "com.kushagra.marveltvlauncher" --web-dir dist || true
-            npx @capacitor/cli add android || true
-            npx @capacitor/cli sync android || true
-            cd android
-            chmod +x gradlew
-            ./gradlew assembleDebug
-          fi
+          npx @capacitor/cli init "Marvel TV Launcher" "com.kushagra.marveltvlauncher" --web-dir dist || true
+          npx @capacitor/cli add android
+          npx @capacitor/cli sync android
+
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload Ready-to-Install TV APK
         uses: actions/upload-artifact@v4
