@@ -2,12 +2,13 @@ name: Build Marvel TV Launcher APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
   build-apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -15,26 +16,36 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version: 17
 
       - name: Install Dependencies & Build Web UI
         run: |
           npm install
           npm run build
-          npx @capacitor/cli add android || true
-          npx @capacitor/cli sync android
 
       - name: Build Debug APK
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          chmod +x ./build-apk.bat || true
+          # Agar capacitor config native folder mein hai
+          if [ -d "android" ]; then
+            cd android
+            chmod +x gradlew
+            ./gradlew assembleDebug
+          else
+            echo "Android folder missing. Initializing capacitor..."
+            npx @capacitor/cli init "Marvel TV Launcher" "com.kushagra.marveltvlauncher" --web-dir dist || true
+            npx @capacitor/cli add android || true
+            npx @capacitor/cli sync android || true
+            cd android
+            chmod +x gradlew
+            ./gradlew assembleDebug
+          fi
 
       - name: Upload Ready-to-Install TV APK
         uses: actions/upload-artifact@v4
